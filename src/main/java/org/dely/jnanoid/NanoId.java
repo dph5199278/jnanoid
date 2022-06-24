@@ -2,6 +2,7 @@
  * Copyright (c) 2017 The JNanoID Authors
  * Copyright (c) 2017 Aventrix LLC
  * Copyright (c) 2017 Andrey Sitnik
+ * Copyright (c) 2022 Dely Ding
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +22,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.aventrix.jnanoid.jnanoid;
+package org.dely.jnanoid;
 
 import java.security.SecureRandom;
 import java.util.Random;
@@ -34,37 +35,33 @@ import java.util.Random;
  *
  * @author David Klebanoff
  */
-public final class NanoIdUtils {
-
+public enum NanoId {
     /**
-     * <code>NanoIdUtils</code> instances should NOT be constructed in standard programming.
-     * Instead, the class should be used as <code>NanoIdUtils.randomNanoId();</code>.
+     * NanoId instance.
      */
-    private NanoIdUtils() {
-        //Do Nothing
-    }
+    INSTANCE;
 
     /**
      * The default random number generator used by this class.
      * Creates cryptographically strong NanoId Strings.
      */
-    public static final SecureRandom DEFAULT_NUMBER_GENERATOR = new SecureRandom();
+    private final SecureRandom DEFAULT_NUMBER_GENERATOR = new SecureRandom();
 
     /**
      * The default alphabet used by this class.
      * Creates url-friendly NanoId Strings using 64 unique symbols.
      */
-    public static final char[] DEFAULT_ALPHABET =
+    private final char[] DEFAULT_ALPHABET =
             "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
     /**
      * The default size used by this class.
      * Creates NanoId Strings with slightly more unique values than UUID v4.
      */
-    public static final int DEFAULT_SIZE = 21;
+    private final int DEFAULT_SIZE = 21;
 
     /**
-     * Static factory to retrieve a url-friendly, pseudo randomly generated, NanoId String.
+     * Static factory to retrieve an url-friendly, pseudo randomly generated, NanoId String.
      *
      * The generated NanoId String will have 21 symbols.
      *
@@ -73,8 +70,51 @@ public final class NanoIdUtils {
      *
      * @return A randomly generated NanoId String.
      */
-    public static String randomNanoId() {
+    public String randomNanoId() {
         return randomNanoId(DEFAULT_NUMBER_GENERATOR, DEFAULT_ALPHABET, DEFAULT_SIZE);
+    }
+
+     /**
+     * Static factory to retrieve an url-friendly, pseudo randomly generated, NanoId String.
+     *
+     * The NanoId String is generated using a cryptographically strong pseudo random number
+     * generator.
+     *
+     * @param size     The number of symbols in the NanoId String.
+     *
+     * @return A randomly generated NanoId String.
+     */
+    public String randomNanoId(final int size) {
+        return randomNanoId(DEFAULT_NUMBER_GENERATOR, DEFAULT_ALPHABET, size);
+    }
+
+    /**
+     * Static factory to retrieve an url-friendly, pseudo randomly generated, NanoId String.
+     *
+     * The NanoId String is generated using a cryptographically strong pseudo random number
+     * generator.
+     *
+     * @param alphabet     The symbols used in the NanoId String.
+     *
+     * @return A randomly generated NanoId String.
+     */
+    public String randomNanoId(final char[] alphabet) {
+        return randomNanoId(DEFAULT_NUMBER_GENERATOR, alphabet, DEFAULT_SIZE);
+    }
+
+    /**
+     * Static factory to retrieve an url-friendly, pseudo randomly generated, NanoId String.
+     *
+     * The NanoId String is generated using a cryptographically strong pseudo random number
+     * generator.
+     *
+     * @param alphabet     The symbols used in the NanoId String.
+     * @param size     The number of symbols in the NanoId String.
+     *
+     * @return A randomly generated NanoId String.
+     */
+    public String randomNanoId(final char[] alphabet, final int size) {
+        return randomNanoId(DEFAULT_NUMBER_GENERATOR, alphabet, size);
     }
 
     /**
@@ -87,7 +127,7 @@ public final class NanoIdUtils {
      * @param size     The number of symbols in the NanoId String.
      * @return A randomly generated NanoId String.
      */
-    public static String randomNanoId(final Random random, final char[] alphabet, final int size) {
+    public String randomNanoId(final Random random, final char[] alphabet, final int size) {
 
         if (random == null) {
             throw new IllegalArgumentException("random cannot be null.");
@@ -108,11 +148,11 @@ public final class NanoIdUtils {
         final int mask = (2 << (int) Math.floor(Math.log(alphabet.length - 1) / Math.log(2))) - 1;
         final int step = (int) Math.ceil(1.6 * mask * size / alphabet.length);
 
-        final StringBuilder idBuilder = new StringBuilder();
+        final StringBuilder idBuilder = new StringBuilder(size);
+        final byte[] bytes = new byte[step];
 
         while (true) {
 
-            final byte[] bytes = new byte[step];
             random.nextBytes(bytes);
 
             for (int i = 0; i < step; i++) {

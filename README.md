@@ -5,7 +5,7 @@
 A unique string ID generator for Java. 
 
 ### Secure
-JNanoID uses Java’s [SecureRandom](https://docs.oracle.com/javase/7/docs/api/java/security/SecureRandom.html) to generate cryptographically strong random IDs with a proper distribution of characters.
+JNanoID uses Java’s [SecureRandom](https://docs.oracle.com/javase/6/docs/api/java/security/SecureRandom.html) to generate cryptographically strong random IDs with a proper distribution of characters.
 
 ### Compact
 JNanoID generates compact IDs with just 21 characters. By using a larger alphabet than UUID, JNanoID can generate a greater number of unique IDs, when compared to UUID, with fewer characters (21 versus 36).
@@ -21,7 +21,7 @@ JNanoID is thoroughly tested with JUnit.
 
 ## Latest Release
 
-The most recent release is JNanoId 2.0.0.
+The most recent release is JNanoId jdk6.
 
 ### Maven
 
@@ -29,29 +29,35 @@ The most recent release is JNanoId 2.0.0.
 <dependency>
   <groupId>com.aventrix.jnanoid</groupId>
   <artifactId>jnanoid</artifactId>
-  <version>2.0.0</version>
+  <version>jdk6</version>
 </dependency>
 ```
 
 ### Gradle
 
+version: before 4.7
 ```groovy
-compile 'com.aventrix.jnanoid:jnanoid:2.0.0'
+compile 'com.aventrix.jnanoid:jnanoid:jdk6'
+```
+
+version: after 4.7 and 4.7
+```groovy
+implementation 'com.aventrix.jnanoid:jnanoid:jdk6'
 ```
 
 ## Usage
 
-JNanoId provides one easy-to-use utility class (`NanoIdUtils`) with two methods to generate IDs.
+JNanoId provides one easy-to-use enum class (`NanoId`) with five methods to generate IDs.
 
 #### Standard IDs - `randomNanoId()`
 
 The default method creates secure, url-friendly, unique ids. It uses a url-friendly alphabet (`A-Za-z0-9_-`), a secure random number generator, and generates a unique ID with 21 characters.
 
 ```java
-String id = NanoIdUtils.randomNanoId(); // "ku-qLNv1wDmIS5_EcT3j7"
+String id = NanoId.INSTANCE.randomNanoId(); // "ku-qLNv1wDmIS5_EcT3j7"
 ```
 
-#### Custom IDs - `NanoIdUtils.randomNanoId(random, alphabet, size);`
+#### Custom IDs - `NanoId.INSTANCE.randomNanoId(random, alphabet, size);`
 
 An additional method allows you to generate custom IDs by specifying your own random number generator, alphabet, or size.
 
@@ -66,12 +72,12 @@ char[] alphabet = {'a','b','c'};
 // Make IDs 10 characters long
 int size = 10;
 
-String id = NanoIdUtils.randomNanoId(random, alphabet, 10); // "babbcaabcb"
+String id = NanoId.INSTANCE.randomNanoId(random, alphabet, 10); // "babbcaabcb"
 ```
 
 ## Copyright and license
 
-Code copyright 2017 [The JNanoID Authors](https://github.com/aventrix/jnanoid/graphs/contributors), [Aventrix LLC](https://www.aventrix.com), and [Andrey Sitnik](https://github.com/ai). Code released under the [MIT License](https://github.com/aventrix/jnanoid/blob/master/LICENSE).
+Code copyright 2022 [The JNanoID Authors](https://github.com/dph5199278/jnanoid/graphs/contributors). Code released under the [MIT License](https://github.com/dph5199278/jnanoid/blob/master/LICENSE).
 
 Based on the original [NanoId](https://github.com/ai/nanoid) for JavaScript by [Andrey Sitnik](https://github.com/ai/).
 

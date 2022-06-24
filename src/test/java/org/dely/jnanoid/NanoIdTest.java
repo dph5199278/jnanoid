@@ -2,6 +2,7 @@
  * Copyright (c) 2017 The JNanoID Authors
  * Copyright (c) 2017 Aventrix LLC
  * Copyright (c) 2017 Andrey Sitnik
+ * Copyright (c) 2022 Dely Ding
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,10 +22,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.aventrix.jnanoid;
+package org.dely.jnanoid;
 
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
-
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -39,29 +39,28 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Tests for NanoIdUtils.
+ * Tests for NanoId.
  *
  * @author David Klebanoff
- * @see NanoIdUtils
+ * @see NanoId
  */
-public class NanoIdUtilsTest {
+public class NanoIdTest {
 
 
     @Test
     public void NanoIdUtils_VerifyClassIsFinal_Verified() {
-        if ((NanoIdUtils.class.getModifiers() & Modifier.FINAL) != Modifier.FINAL) {
+        if ((NanoId.class.getModifiers() & Modifier.FINAL) != Modifier.FINAL) {
             fail("The class is not final");
         }
     }
 
     @Test
     public void NanoIdUtils_VerifyConstructorsArePrivate_Verified() {
-        for (final Constructor<?> constructor : NanoIdUtils.class.getConstructors()) {
+        for (final Constructor<?> constructor : NanoId.class.getConstructors()) {
             if ((constructor.getModifiers() & Modifier.PRIVATE) != Modifier.PRIVATE) {
                 fail("The class has a non-private constructor.");
             }
@@ -73,11 +72,11 @@ public class NanoIdUtilsTest {
 
         //It's not much, but it's a good sanity check I guess.
         final int idCount = 100000;
-        final Set<String> ids = new HashSet<>(idCount);
+        final Set<String> ids = new HashSet<String>(idCount);
 
         for (int i = 0; i < idCount; i++) {
-            final String id = NanoIdUtils.randomNanoId();
-            if (ids.contains(id) == false) {
+            final String id = NanoId.INSTANCE.randomNanoId();
+            if (!ids.contains(id)) {
                 ids.add(id);
             } else {
                 fail("Non-unique ID generated: " + id);
@@ -102,7 +101,7 @@ public class NanoIdUtilsTest {
                 "7nj2dWW1gjKLtgfzeI8eC", "I6BXYvyjszq6xV7L9k2A9", "uIolcQEyyQIcn3iM6Odoa" };
 
         for (final String expectedId : expectedIds) {
-            final String generatedId = NanoIdUtils.randomNanoId(random, alphabet, size);
+            final String generatedId = NanoId.INSTANCE.randomNanoId(random, alphabet, size);
             assertEquals(expectedId, generatedId);
         }
 
@@ -119,9 +118,8 @@ public class NanoIdUtilsTest {
                 alphabet[i] = (char) i;
             }
 
-            final String id = NanoIdUtils
-                    .randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet,
-                            NanoIdUtils.DEFAULT_SIZE);
+            final String id = NanoId.INSTANCE
+                    .randomNanoId(alphabet);
 
             //Create a regex pattern that only matches to the characters in the alphabet
             final StringBuilder patternBuilder = new StringBuilder();
@@ -142,8 +140,20 @@ public class NanoIdUtilsTest {
         //Test ID generation with all sizes between 1 and 1,000.
         for (int size = 1; size <= 1000; size++) {
 
-            final String id = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
-                    NanoIdUtils.DEFAULT_ALPHABET, size);
+            final String id = NanoId.INSTANCE.randomNanoId(size);
+
+            assertEquals(size, id.length());
+        }
+
+    }
+
+    @Test
+    public void NanoIdUtils_DefinedSizes_Success() {
+
+        //Test ID generation with all sizes between 1 and 1,000.
+        for (int size = 1; size <= 1000; size++) {
+
+            final String id = NanoId.INSTANCE.randomNanoId(size);
 
             assertEquals(size, id.length());
         }
@@ -159,12 +169,12 @@ public class NanoIdUtilsTest {
         final int idSize = 20;
         final char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 
-        final Map<String, Long> charCounts = new HashMap<>();
+        final Map<String, Long> charCounts = new HashMap<String, Long>();
 
         for (int i = 0; i < idCount; i++) {
 
-            final String id = NanoIdUtils
-                    .randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, idSize);
+            final String id = NanoId.INSTANCE
+                    .randomNanoId(alphabet, idSize);
 
             for (int j = 0; j < id.length(); j++) {
                 final String value = String.valueOf(id.charAt(j));
@@ -181,24 +191,24 @@ public class NanoIdUtilsTest {
         //Verify the distribution of characters is pretty even
         for (final Long charCount : charCounts.values()) {
             final double distribution = (charCount * alphabet.length / (double) (idCount * idSize));
-            assertThat(distribution, Matchers.closeTo(1.0, 0.05));
+            MatcherAssert.assertThat(distribution, Matchers.closeTo(1.0, 0.05));
         }
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void randomNanoId_NullRandom_ExceptionThrown() {
-        NanoIdUtils.randomNanoId(null, new char[] {'a', 'b', 'c'}, 10);
+        NanoId.INSTANCE.randomNanoId(null, new char[] {'a', 'b', 'c'}, 10);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void randomNanoId_NullAlphabet_ExceptionThrown() {
-        NanoIdUtils.randomNanoId(new SecureRandom(), null, 10);
+        NanoId.INSTANCE.randomNanoId(new SecureRandom(), null, 10);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void randomNanoId_EmptyAlphabet_ExceptionThrown() {
-        NanoIdUtils.randomNanoId(new SecureRandom(), new char[] {}, 10);
+        NanoId.INSTANCE.randomNanoId(new SecureRandom(), new char[] {}, 10);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -210,18 +220,18 @@ public class NanoIdUtilsTest {
             largeAlphabet[i] = (char) i;
         }
 
-        NanoIdUtils.randomNanoId(new SecureRandom(), largeAlphabet, 20);
+        NanoId.INSTANCE.randomNanoId(new SecureRandom(), largeAlphabet, 20);
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void randomNanoId_NegativeSize_ExceptionThrown() {
-        NanoIdUtils.randomNanoId(new SecureRandom(), new char[] {'a', 'b', 'c'}, -10);
+        NanoId.INSTANCE.randomNanoId(new SecureRandom(), new char[] {'a', 'b', 'c'}, -10);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void randomNanoId_ZeroSize_ExceptionThrown() {
-        NanoIdUtils.randomNanoId(new SecureRandom(), new char[] {'a', 'b', 'c'}, 0);
+        NanoId.INSTANCE.randomNanoId(new SecureRandom(), new char[] {'a', 'b', 'c'}, 0);
     }
 
 }
