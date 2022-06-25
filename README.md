@@ -1,7 +1,7 @@
 # JNanoId
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.dph5199278/jnanoid/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.dph5199278/jnanoid)
 
-A unique string ID generator for Java. 
+A unique string ID generator for Java.
 
 ### Secure
 JNanoID uses Java’s [SecureRandom](https://docs.oracle.com/javase/6/docs/api/java/security/SecureRandom.html) to generate cryptographically strong random IDs with a proper distribution of characters.
@@ -26,7 +26,7 @@ The most recent release is JNanoId jdk6.
 
 ```xml
 <dependency>
-  <groupId>com.aventrix.jnanoid</groupId>
+  <groupId>io.github.dph5199278</groupId>
   <artifactId>jnanoid</artifactId>
   <version>jdk6</version>
 </dependency>
@@ -36,12 +36,12 @@ The most recent release is JNanoId jdk6.
 
 version: before 4.7
 ```groovy
-compile 'com.aventrix.jnanoid:jnanoid:jdk6'
+compile 'io.github.dph5199278:jnanoid:jdk6'
 ```
 
 version: after 4.7 and 4.7
 ```groovy
-implementation 'com.aventrix.jnanoid:jnanoid:jdk6'
+implementation 'io.github.dph5199278:jnanoid:jdk6'
 ```
 
 ## Usage
@@ -66,12 +66,12 @@ An additional method allows you to generate custom IDs by specifying your own ra
 Random random = new Random();
 
 // Use a custom alphabet containing only a, b, and c
-char[] alphabet = {'a','b','c'};
+    char[] alphabet = {'a','b','c'};
 
 // Make IDs 10 characters long
-int size = 10;
+    int size = 10;
 
-String id = NanoId.INSTANCE.randomNanoId(random, alphabet, 10); // "babbcaabcb"
+    String id = NanoId.INSTANCE.randomNanoId(random, alphabet, 10); // "babbcaabcb"
 ```
 
 ## Copyright and license
