@@ -24,6 +24,7 @@
 
 package org.dely.jnanoid;
 
+import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -130,11 +131,11 @@ public enum NanoId {
     public String randomNanoId(final Random random, final char[] alphabet, final int size) {
 
         if (random == null) {
-            throw new IllegalArgumentException("random cannot be null.");
+            throw new NullPointerException("random cannot be null.");
         }
 
         if (alphabet == null) {
-            throw new IllegalArgumentException("alphabet cannot be null.");
+            throw new NullPointerException("alphabet cannot be null.");
         }
 
         if (alphabet.length == 0 || alphabet.length >= 256) {
@@ -145,10 +146,16 @@ public enum NanoId {
             throw new IllegalArgumentException("size must be greater than zero.");
         }
 
-        final int mask = (2 << (int) Math.floor(Math.log(alphabet.length - 1) / Math.log(2))) - 1;
-        final int step = (int) Math.ceil(1.6 * mask * size / alphabet.length);
+        if(alphabet.length == 1){
+            return repeat(alphabet[0], size);
+        }
 
-        final StringBuilder idBuilder = new StringBuilder(size);
+        final int mask = (2 << Math.INSTANCE.log2(alphabet.length - 1, RoundingMode.FLOOR)) - 1;
+        final int step = (int) java.lang.Math.ceil(1.6 * mask * size / alphabet.length);
+
+        final char[] id = new char[size];
+        int idIndex = 0;
+
         final byte[] bytes = new byte[step];
 
         while (true) {
@@ -160,9 +167,9 @@ public enum NanoId {
                 final int alphabetIndex = bytes[i] & mask;
 
                 if (alphabetIndex < alphabet.length) {
-                    idBuilder.append(alphabet[alphabetIndex]);
-                    if (idBuilder.length() == size) {
-                        return idBuilder.toString();
+                    id[idIndex++] = alphabet[alphabetIndex];
+                    if (idIndex == size) {
+                        return String.valueOf(id);
                     }
                 }
 
@@ -170,5 +177,13 @@ public enum NanoId {
 
         }
 
+    }
+
+    private static String repeat(char c, int size){
+        StringBuilder builder = new StringBuilder(size);
+        for(int i=0; i< size;++i){
+            builder.append(c);
+        }
+        return builder.toString();
     }
 }

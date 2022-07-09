@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.dph5199278</groupId>
     <artifactId>jnanoid</artifactId>
-    <version>jdk6</version>
+    <version>jdk6.1</version>
     <packaging>jar</packaging>
     <name>JNanoId</name>
     <description>A unique string ID generator for Java.</description>

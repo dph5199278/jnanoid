@@ -196,12 +196,12 @@ public class NanoIdTest {
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void randomNanoId_NullRandom_ExceptionThrown() {
         NanoId.INSTANCE.randomNanoId(null, new char[] {'a', 'b', 'c'}, 10);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void randomNanoId_NullAlphabet_ExceptionThrown() {
         NanoId.INSTANCE.randomNanoId(new SecureRandom(), null, 10);
     }
@@ -234,4 +234,78 @@ public class NanoIdTest {
         NanoId.INSTANCE.randomNanoId(new SecureRandom(), new char[] {'a', 'b', 'c'}, 0);
     }
 
+    /**
+     * Test result: 1us ~ 3us
+     */
+    @Test
+    public void test_string_builder() {
+        StringBuilder sb;
+        for(int i = 0; i < 10000; i++) {
+            sb = new StringBuilder(5);
+            sb.append((char)17);
+        }
+
+        long test = System.nanoTime();
+        int size = 21;
+
+        sb = new StringBuilder(size);
+        for(int i = 0; i < size; i++) {
+            sb.append((char) i);
+        }
+
+        long test10 = System.nanoTime();
+        System.out.printf("StringBuilder21: %d%n", test10 - test);
+
+        test10 = System.nanoTime();
+        size = 100;
+
+        sb = new StringBuilder(size);
+        for(int i = 0; i < size; i++) {
+            sb.append((char) i);
+        }
+
+        long test100 = System.nanoTime();
+        System.out.printf("StringBuilder100: %d%n", test100 - test10);
+    }
+
+    /**
+     * Test result: 0.5us ~ 2us
+     */
+    @Test
+    public void test_char_arr() {
+        char[] sb;
+        for(int i = 0; i < 10000; i++) {
+            sb = new char[5];
+            sb[0] = (char)17;
+        }
+
+        long test = System.nanoTime();
+        int size = 21;
+
+        sb = new char[size];
+        for(int i = 0; i < size; i++) {
+            sb[i] = (char) i;
+        }
+
+        long test10 = System.nanoTime();
+        System.out.printf("char[]21: %d%n", test10 - test);
+
+        test10 = System.nanoTime();
+        size = 100;
+
+        sb = new char[size];
+        for(int i = 0; i < size; i++) {
+            sb[i] = (char) i;
+        }
+
+        long test100 = System.nanoTime();
+        System.out.printf("char[]100: %d%n", test100 - test10);
+    }
+
+    @Test
+    public void test_test() {
+        String id = NanoId.INSTANCE.randomNanoId();
+        System.out.println(id);
+        System.out.println(id.length());
+    }
 }
